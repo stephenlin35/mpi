@@ -14,7 +14,7 @@ slin@10.111.111.113
 slin@10.111.111.114
 slin@10.111.111.115
 slin@10.111.111.116
-slin@Gomera:~$ mpicc mpi[K[K[K[K[K[K[K[K[Kcat mpi_test.c
+slin@Gomera:~$ cat mpi_test.c
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -66,8 +66,8 @@ main(int argc, char* argv[]) {
 	/*  Shut down MPI  */
 	MPI_Finalize();
 }
-slin@Gomera:~$ [Kslin@Gomera:~$ mpicc mpi_test.c
-slin@Gomera:~$ mpirun -np 20 --loadbalance --hostfile .pi_hostfile ./.[Ka.out[1@m[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+slin@Gomera:~$ slin@Gomera:~$ mpicc mpi_test.c
+slin@Gomera:~$ mpirun -np 20 --loadbalance --hostfile .mpi_hostfile ./a.out
 Greeting from process 0: palma
 
 Greeting from process 1: palma
