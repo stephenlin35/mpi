@@ -1,0 +1,114 @@
+Script started on Sun 07 Feb 2016 02:52:30 PM EST
+slin@Gomera:~$ ls
+a.out	cobol1.cbl  hello.cbl  helloworld_mpi.c  mpi_test.c	  mpi_transcript.scr
+cobol1	hello	    hello.so   hostfile1	 mpi_test.c.save  system_test.c
+slin@Gomera:~$ ls -a
+.	       cobol1	   hello.cbl	     .mpi_hostfile	 .ssh
+..	       cobol1.cbl  hello.so	     mpi_test.c		 system_test.c
+a.out	       .config	   helloworld_mpi.c  mpi_test.c.save	 .viminfo
+.bash_history  hello	   hostfile1	     mpi_transcript.scr  .vimrc
+slin@Gomera:~$ cat .mpi_hostfile 
+slin@10.111.111.111
+slin@10.111.111.112
+slin@10.111.111.113
+slin@10.111.111.114
+slin@10.111.111.115
+slin@10.111.111.116
+slin@Gomera:~$ mpicc mpi[K[K[K[K[K[K[K[K[Kcat mpi_test.c
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include "/usr/lib/openmpi/include/mpi.h"
+
+main(int argc, char* argv[]) {
+	int my_rank;				/*	rank of process		*/
+	int p;					/*	number of processes	*/
+	int source;				/*	rank of sender		*/
+	int dest;				/*	rank of receiver	*/
+	int tag = 0;				/*	tag for messages	*/	
+	char message[100] = "Test message";	/*	storage for message	*/
+	MPI_Status status;			/*	return status for	*/
+						/*	receive			*/
+	FILE * f = popen("hostname", "r");
+	char buf[64];
+	while(fgets(buf, sizeof(buf), f) != 0) {}
+	pclose(f);
+	
+	/*  Start up MPI  */
+	MPI_Init(&argc, &argv);
+
+	/*  Find out process rank  */
+	MPI_Comm_rank(MPI_COMM_WORLD, &my_rank);
+//	printf("%d\n", my_rank);
+
+	/*  Find out number of processes  */
+	MPI_Comm_size(MPI_COMM_WORLD, &p);
+//	printf("%d\n", p);
+
+	if(my_rank != 0) {
+		/*  Create message  */
+		sprintf(message, "Greeting from process %d: %s", my_rank, buf);
+		dest = 0;
+		
+		/*  Use strlen+1 so that '\0' gets transmitted  */
+		MPI_Send(message, strlen(message)+1, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+	} else {
+		sprintf(message, "Greeting from process %d: %s", my_rank, buf);
+		dest = 0;
+		MPI_Send(message, strlen(message)+1, MPI_CHAR, dest, tag, MPI_COMM_WORLD);
+
+		/*  my_rank = 0  */
+		for(source = 0; source < p; source++) {
+			MPI_Recv(message, 100, MPI_CHAR, source, tag, MPI_COMM_WORLD, &status);
+			printf("%s\n", message);
+		}
+	}
+	/*  Shut down MPI  */
+	MPI_Finalize();
+}
+slin@Gomera:~$ [Kslin@Gomera:~$ mpicc mpi_test.c
+slin@Gomera:~$ mpirun -np 20 --loadbalance --hostfile .pi_hostfile ./.[Ka.out[1@m[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C[C
+Greeting from process 0: palma
+
+Greeting from process 1: palma
+
+Greeting from process 2: palma
+
+Greeting from process 3: palma
+
+Greeting from process 4: tenerife
+
+Greeting from process 5: tenerife
+
+Greeting from process 6: tenerife
+
+Greeting from process 7: tenerife
+
+Greeting from process 8: Gomera
+
+Greeting from process 9: Gomera
+
+Greeting from process 10: Gomera
+
+Greeting from process 11: canary
+
+Greeting from process 12: canary
+
+Greeting from process 13: canary
+
+Greeting from process 14: Hierro
+
+Greeting from process 15: Hierro
+
+Greeting from process 16: Hierro
+
+Greeting from process 17: fuerteventura
+
+Greeting from process 18: fuerteventura
+
+Greeting from process 19: fuerteventura
+
+slin@Gomera:~$ exit
+exit
+
+Script done on Sun 07 Feb 2016 02:54:52 PM EST
